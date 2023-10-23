@@ -1,5 +1,5 @@
 (() => {
-  const studentsList = [
+  let studentsList = [
     {
       surname: 'Коринец',
       name: 'Кирилл',
@@ -176,36 +176,82 @@
     };
   };
 
+  function filter(arr, prop, value) {
+    let result = [];
+    let copy = [...arr];
+    for (let item of copy) {
+      if (String(item[prop]).toLowerCase().includes(value.toLowerCase()) == true) result.push(item);
+    };
+    return result;
+  };
+
   function createFilter() {
     const container = document.getElementById('students-app');
     const form = document.createElement('form');
-    const buttonWrapper = document.createElement('div');
-    const button = document.createElement('button');
-    const input = document.createElement('input');
 
     form.classList.add('input-group', 'mb-2');
-    buttonWrapper.classList.add('input-group-append');
-    button.classList.add('btn', 'btn-primary');
-    button.textContent = 'Отфильровать';
-    button.id = 'add-button';
     form.id = 'student-form';
-    input.placeholder = 'Введите данные';
 
-    input.setAttribute('required', 'true');
-    input.classList.add('form-control');
-    form.append(input);
+    for (let i = 1; i <= 6; i++) {
+      const input = document.createElement('input');
 
-    input.addEventListener('input', () => {
-      input.value = input.value.trim();
-    });
+      input.setAttribute('required', 'true');
+      input.classList.add('form-control');
+
+      switch (i) {
+        case 1:
+          input.placeholder = 'Введите Фамилию';
+          input.id = 'surname-filter';
+          break;
+        case 2:
+          input.placeholder = 'Введите Имя';
+          input.id = 'name-filter';
+          break;
+        case 3:
+          input.placeholder = 'Введите Отчество';
+          input.id = 'middlename-filter';
+          break;
+        case 4:
+          input.placeholder = 'Введите факультет';
+          input.id = 'faculty-filter';
+          break;
+        case 5:
+          input.placeholder = 'Введите год начала обучения';
+          input.id = 'start-year-filter';
+          break;
+        case 6:
+          input.placeholder = 'Введите год окончания обучения';
+          input.id = 'end-year-filter';
+          break;
+      };
+
+      form.append(input);
+
+      input.addEventListener('input', () => {
+        const container = document.getElementById('students-list');
+        const nameFilter = document.getElementById('name-filter').value;
+        const surnameFilter = document.getElementById('surname-filter').value;
+        const middlenameFilter = document.getElementById('middlename-filter').value;
+        const facultyFilter = document.getElementById('faculty-filter').value;
+        const startYearFilter = document.getElementById('start-year-filter').value;
+        const endYearFilter = document.getElementById('end-year-filter').value;
+
+        let filteredStudentsList = [...studentsList];
+
+        if (nameFilter !== '') filteredStudentsList = filter(filteredStudentsList, 'name', nameFilter);
+        if (surnameFilter !== '') filteredStudentsList = filter(filteredStudentsList, 'surname', surnameFilter);
+        if (middlenameFilter !== '') filteredStudentsList = filter(filteredStudentsList, 'middlename', middlenameFilter);
+        if (facultyFilter !== '') filteredStudentsList = filter(filteredStudentsList, 'faculty', facultyFilter);
+        if (startYearFilter !== '') filteredStudentsList = filter(filteredStudentsList, 'year', startYearFilter);
+        if (endYearFilter !== '') filteredStudentsList = filter(filteredStudentsList, 'year', endYearFilter);
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        };
+        renderStudentsTable(filteredStudentsList);
+      });
+    };
 
     container.append(form);
-    buttonWrapper.append(button);
-    form.append(buttonWrapper);
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-    });
   };
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -226,8 +272,8 @@
       } else {
         if ((new Date().getFullYear() - document.getElementById('input-year').value) > 4) {
           studentsList.push({
-            name: document.getElementById('input-name').value,
             surname: document.getElementById('input-surname').value,
+            name: document.getElementById('input-name').value,
             middlename: document.getElementById('input-middlename').value,
             date: `${date2[2]}.${date2[1]}.${date2[0]}`,
             year: `${document.getElementById('input-year').value}-${Number(document.getElementById('input-year').value) + 4} (Закончил обучение)`,
@@ -235,8 +281,8 @@
           });
         } else {
           studentsList.push({
-            name: document.getElementById('input-name').value,
             surname: document.getElementById('input-surname').value,
+            name: document.getElementById('input-name').value,
             middlename: document.getElementById('input-middlename').value,
             date: `${date2[2]}.${date2[1]}.${date2[0]}`,
             year: `${document.getElementById('input-year').value}-${Number(document.getElementById('input-year').value) + 4} (${new Date().getFullYear() - document.getElementById('input-year').value} курс)`,
